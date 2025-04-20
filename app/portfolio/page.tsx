@@ -2,19 +2,17 @@ import { notFound } from "next/navigation";
 import projects from "@/app/data/portfolio";
 import Image from "next/image";
 
-type Props = {
-  params: {
-    slug: string;
-  };
-};
-
 export async function generateStaticParams() {
   return projects.map((project) => ({
     slug: project.slug,
   }));
 }
 
-export default function ProjectDetailPage({ params }: Props) {
+export default function ProjectDetailPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
   const project = projects.find((p) => p.slug === params.slug);
 
   if (!project) return notFound();
