@@ -10,7 +10,6 @@ interface Feedback {
 }
 
 export default function Contact() {
-  // Tipe data untuk formData dan feedbacks
   const [formData, setFormData] = useState<{ name: string; message: string; rating: number }>({
     name: '',
     message: '',
@@ -18,36 +17,40 @@ export default function Contact() {
   });
 
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+  const [average, setAverage] = useState<number>(0);
+  const [total, setTotal] = useState<number>(0);
 
-  // Fetch feedbacks dari API
+  // Fetch feedbacks + average dari API
   const fetchFeedbacks = async () => {
     try {
       const res = await fetch('/api/feedback');
       if (!res.ok) {
         throw new Error('Failed to fetch feedback');
       }
-      const data: Feedback[] = await res.json();
-      setFeedbacks(data);
+
+      const data = await res.json();
+      setFeedbacks(data.feedbacks);
+      setAverage(data.averageRating);
+      setTotal(data.total);
     } catch (error) {
       console.error('Error fetching feedbacks:', error);
     }
   };
 
-  // Menarik data feedback saat komponen pertama kali dimuat
   useEffect(() => {
     fetchFeedbacks();
   }, []);
 
-  // Handler untuk perubahan input form
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: name === 'rating' ? Number(value) : value,
     }));
   };
 
-  // Handler untuk mengirim form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -60,7 +63,7 @@ export default function Contact() {
       if (res.ok) {
         alert('Terima kasih atas komentar dan rating Anda!');
         setFormData({ name: '', message: '', rating: 0 });
-        fetchFeedbacks(); // Refresh daftar feedback
+        fetchFeedbacks(); // Refresh data
       } else {
         alert('Gagal mengirim feedback');
       }
@@ -68,11 +71,6 @@ export default function Contact() {
       console.error('Error submitting feedback:', error);
     }
   };
-
-  // Menghitung rating rata-rata
-  const ratings = feedbacks.map((f) => f.rating).filter((r) => !isNaN(r));
-  const averageRating =
-    ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) : '0';
 
   return (
     <section className="bg-gray-50 py-16">
@@ -83,7 +81,9 @@ export default function Contact() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow">
-            <h3 className="text-xl font-bold mb-4 text-indigo-700">💬 Kirim Komentar dan Rating</h3>
+            <h3 className="text-xl font-bold mb-4 text-indigo-700">
+              💬 Kirim Komentar dan Rating
+            </h3>
             <input
               type="text"
               name="name"
@@ -121,12 +121,18 @@ export default function Contact() {
           </form>
 
           <div>
-            <h3 className="text-xl font-bold mb-4 text-indigo-700">📝 Komentar & Rating</h3>
-            <p className="mb-4">⭐ Rata-rata rating: <strong>{averageRating}</strong> dari {feedbacks.length} pengguna</p>
+            <h3 className="text-xl font-bold mb-4 text-indigo-700">
+              📝 Komentar & Rating
+            </h3>
+            <p className="mb-4">
+              ⭐ Rata-rata rating: <strong>{average}</strong> dari {total} pengguna
+            </p>
             <ul className="space-y-4">
               {feedbacks.map((fb, i) => (
                 <li key={i} className="p-4 bg-white rounded shadow">
-                  <p><strong>{fb.name}</strong> ({fb.rating}⭐)</p>
+                  <p>
+                    <strong>{fb.name}</strong> ({fb.rating}⭐)
+                  </p>
                   <p>{fb.message}</p>
                 </li>
               ))}
