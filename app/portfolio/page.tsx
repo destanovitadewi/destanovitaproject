@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import projects from "@/app/data/portfolio";
 import Image from "next/image";
-import { Metadata } from "next";
 
 type Props = {
   params: {
