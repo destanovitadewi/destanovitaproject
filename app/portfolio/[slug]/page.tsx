@@ -1,38 +1,30 @@
-import { notFound } from "next/navigation";
 import projects from "@/app/data/portfolio";
+import Link from "next/link";
 import Image from "next/image";
 
-
-// Hapus pengetikan manual untuk params karena Next.js sudah menangani ini di App Directory
-export default function ProjectDetailPage({ params }: { params: { slug: string } }) {
-  const project = projects.find((p) => p.slug === params.slug);
-
-  if (!project) return notFound();
-
+export default function PortfolioPage() {
   return (
     <div className="bg-gray-900 text-white min-h-screen p-6">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-4">{project.title}</h1>
-        <p className="text-gray-400">{project.year}</p>
-        <div className="my-6">
-          <Image
-            src={project.image}
-            alt={project.title}
-            width={600}
-            height={400}
-            className="rounded-lg object-cover"
-          />
-        </div>
-        <p className="text-lg">{project.description}</p>
-        <div className="mt-8">
-
-            View GitHub →
-        
-        </div>
-        <div className="mt-6">
-          
-            ← Back to Portfolio
-          
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-4xl font-bold mb-6">My Projects</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {projects.map((project) => (
+            <Link
+              key={project.slug}
+              href={`/portfolio/${project.slug}`}
+              className="bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition"
+            >
+              <Image
+                src={project.image}
+                alt={project.title}
+                width={400}
+                height={250}
+                className="rounded-md object-cover mb-4"
+              />
+              <h2 className="text-xl font-semibold">{project.title}</h2>
+              <p className="text-gray-400 text-sm">{project.year}</p>
+            </Link>
+          ))}
         </div>
       </div>
     </div>
