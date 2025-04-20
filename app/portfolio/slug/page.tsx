@@ -2,9 +2,17 @@ import { notFound } from "next/navigation";
 import projects from "@/app/data/portfolio";
 import Image from "next/image";
 
+export async function generateStaticParams() {
+  return projects.map((project) => ({
+    slug: project.slug,
+  }));
+}
 
-// Hapus pengetikan manual untuk params karena Next.js sudah menangani ini di App Directory
-export default function ProjectDetailPage({ params }: { params: { slug: string } }) {
+export default function ProjectDetailPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
   const project = projects.find((p) => p.slug === params.slug);
 
   if (!project) return notFound();
@@ -24,16 +32,6 @@ export default function ProjectDetailPage({ params }: { params: { slug: string }
           />
         </div>
         <p className="text-lg">{project.description}</p>
-        <div className="mt-8">
-
-            View GitHub →
-        
-        </div>
-        <div className="mt-6">
-          
-            ← Back to Portfolio
-          
-        </div>
       </div>
     </div>
   );
